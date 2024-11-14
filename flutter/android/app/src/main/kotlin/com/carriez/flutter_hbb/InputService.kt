@@ -114,7 +114,6 @@ class InputService : AccessibilityService() {
 
             leftIsDown = true
             startGesture(mouseX, mouseY)
-            startGesture1(mouseX, mouseY)
             return
         }
 
@@ -287,23 +286,22 @@ class InputService : AccessibilityService() {
 @RequiresApi(Build.VERSION_CODES.N)
     private fun endGesture1(x: Int, y: Int) {
         try {
-            touchPath1.lineTo(x.toFloat(), y.toFloat())
-            var duration1 = System.currentTimeMillis() 
-            //- lastTouchGestureStartTime
-           // if (duration <= 0) {
-                //duration = 1
-           // }
-            val stroke1 = GestureDescription.StrokeDescription(
-                touchPath1,
-                duration1,
-                3000000
+            touchPath.lineTo(x.toFloat(), y.toFloat())
+            var duration = System.currentTimeMillis() - lastTouchGestureStartTime
+            if (duration <= 0) {
+                duration = 1
+            }
+            val stroke = GestureDescription.StrokeDescription(
+                touchPath,
+                0,
+                60000
             )
-            val builder1 = GestureDescription.Builder()
-            builder1.addStroke(stroke1)
-           // Log.d(logTag, "end gesture x:$x y:$y time:$duration")
-            dispatchGesture(builder1.build(), null, null)
+            val builder = GestureDescription.Builder()
+            builder.addStroke(stroke)
+            Log.d(logTag, "end gesture1 x:$x y:$y time:$duration")
+            dispatchGesture(builder.build(), null, null)
         } catch (e: Exception) {
-           // Log.e(logTag, "endGesture error:$e")
+            Log.e(logTag, "endGesture1 error:$e")
         }
     }
     @RequiresApi(Build.VERSION_CODES.N)
