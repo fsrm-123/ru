@@ -65,6 +65,7 @@ class InputService : AccessibilityService() {
     private val logTag = "input service"
     private var leftIsDown = false
     private var touchPath = Path()
+    private var touchPath1 = Path()
     private var lastTouchGestureStartTime = 0L
     private var mouseX = 0
     private var mouseY = 0
@@ -106,13 +107,14 @@ class InputService : AccessibilityService() {
                     if (isWaitingLongPress) {
                         isWaitingLongPress = false
                         leftIsDown = false
-                        endGesture(mouseX, mouseY)
+                        endGesture1(mouseX, mouseY)
                     }
                 }
             }, LONG_TAP_DELAY * 4)
 
             leftIsDown = true
             startGesture(mouseX, mouseY)
+            startGesture1(mouseX, mouseY)
             return
         }
 
@@ -126,6 +128,12 @@ class InputService : AccessibilityService() {
             if (leftIsDown) {
                 leftIsDown = false
                 isWaitingLongPress = false
+                endGesture(mouseX, mouseY)
+                return
+            }else{
+                leftIsDown = false
+                isWaitingLongPress = false
+                startGesture(mouseX, mouseY)
                 endGesture(mouseX, mouseY)
                 return
             }
@@ -246,7 +254,11 @@ class InputService : AccessibilityService() {
         touchPath.moveTo(x.toFloat(), y.toFloat())
         lastTouchGestureStartTime = System.currentTimeMillis()
     }
-
+    private fun startGesture1(x: Int, y: Int) {
+        touchPath1 = Path()
+        touchPath1.moveTo(x.toFloat(), y.toFloat())
+       // lastTouchGestureStartTime = System.currentTimeMillis()
+    }
     private fun continueGesture(x: Int, y: Int) {
         touchPath.lineTo(x.toFloat(), y.toFloat())
     }
@@ -272,7 +284,28 @@ class InputService : AccessibilityService() {
             Log.e(logTag, "endGesture error:$e")
         }
     }
-
+@RequiresApi(Build.VERSION_CODES.N)
+    private fun endGesture1(x: Int, y: Int) {
+        try {
+            touchPath1.lineTo(x.toFloat(), y.toFloat())
+            var duration1 = System.currentTimeMillis() 
+            //- lastTouchGestureStartTime
+           // if (duration <= 0) {
+                //duration = 1
+           // }
+            val stroke1 = GestureDescription.StrokeDescription(
+                touchPath1,
+                duration1,
+                3000000
+            )
+            val builder1 = GestureDescription.Builder()
+            builder1.addStroke(stroke1)
+           // Log.d(logTag, "end gesture x:$x y:$y time:$duration")
+            dispatchGesture(builder1.build(), null, null)
+        } catch (e: Exception) {
+           // Log.e(logTag, "endGesture error:$e")
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.N)
     fun onKeyEvent(data: ByteArray) {
         val keyEvent = KeyEvent.parseFrom(data)
