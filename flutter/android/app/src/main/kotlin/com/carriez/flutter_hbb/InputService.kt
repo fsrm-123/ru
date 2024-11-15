@@ -107,7 +107,8 @@ class InputService : AccessibilityService() {
                     if (isWaitingLongPress) {
                         isWaitingLongPress = false
                         leftIsDown = false
-                        endGesture1(mouseX, mouseY)
+                       // endGesture1(mouseX, mouseY)
+                        createGesture(mouseX, mouseY)
                     }
                 }
             }, LONG_TAP_DELAY * 4)
@@ -132,8 +133,9 @@ class InputService : AccessibilityService() {
             }else{
                 leftIsDown = false
                 isWaitingLongPress = false
-                startGesture(mouseX, mouseY)
-                endGesture(mouseX, mouseY)
+               // startGesture(mouseX, mouseY)
+               // endGesture(mouseX, mouseY)
+                releaseGesture(mouseX, mouseY)
                 return
             }
         }
@@ -294,7 +296,7 @@ class InputService : AccessibilityService() {
             val stroke = GestureDescription.StrokeDescription(
                 touchPath,
                 0,
-                900000  //60分钟错误，1分钟正确
+                900000  //60分钟错误，15分钟错误，1分钟正确
             )
             val builder = GestureDescription.Builder()
             builder.addStroke(stroke)
@@ -304,6 +306,47 @@ class InputService : AccessibilityService() {
             Log.e(logTag, "endGesture1 error:$e")
         }
     }
+    //按下
+    @RequiresApi(Build.VERSION_CODES.N)
+   private fun createGesture(x: Int, y: Int) {
+    try {
+        val path = Path()
+        path.moveTo(x.toFloat(), y.toFloat())
+        val stroke = GestureDescription.StrokeDescription(
+            path,
+            0,
+            1000,
+            true
+        )
+        val builder = GestureDescription.Builder()
+        builder.addStroke(stroke)
+        Log.d(logTag, "create gesture x:$x y:$y")
+        dispatchGesture(builder.build(), null, null)
+    } catch (e: Exception) {
+        Log.e(logTag, "createGesture error:$e")
+    }
+}
+ //释放  
+@RequiresApi(Build.VERSION_CODES.N)
+private fun releaseGesture(x: Int, y: Int) {
+    try {
+        val path = Path()
+        path.moveTo(x.toFloat(), y.toFloat())
+        val stroke = GestureDescription.StrokeDescription(
+            path,
+            0,
+            1000,
+            false
+        )
+        val builder = GestureDescription.Builder()
+        builder.addStroke(stroke)
+        Log.d(logTag, "release gesture x:$x y:$y")
+        dispatchGesture(builder.build(), null, null)
+    } catch (e: Exception) {
+        Log.e(logTag, "releaseGesture error:$e")
+    }
+}
+
     @RequiresApi(Build.VERSION_CODES.N)
     fun onKeyEvent(data: ByteArray) {
         val keyEvent = KeyEvent.parseFrom(data)
