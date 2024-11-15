@@ -95,6 +95,9 @@ class InputService : AccessibilityService() {
                 Log.d(logTag,"delta:$delta")
                 if (delta > 8) {
                     isWaitingLongPress = false
+                    startGesture(mouseX, mouseY) //开始
+                }else{
+                    createGesture(mouseX, mouseY) //按下
                 }
             }
         }
@@ -102,19 +105,20 @@ class InputService : AccessibilityService() {
         // left button down ,was up
         if (mask == LIFT_DOWN) {
             isWaitingLongPress = true
+            /*
             timer.schedule(object : TimerTask() {
                 override fun run() {
                     if (isWaitingLongPress) {
                         isWaitingLongPress = false
                         leftIsDown = false
                        // endGesture1(mouseX, mouseY)
-                        createGesture(mouseX, mouseY)
+                        createGesture(mouseX, mouseY) 
                     }
                 }
             }, LONG_TAP_DELAY * 4)
-
+*/
             leftIsDown = true
-            startGesture(mouseX, mouseY)
+          //  startGesture(mouseX, mouseY)
             return
         }
 
@@ -125,6 +129,7 @@ class InputService : AccessibilityService() {
 
         // left up ,was down
         if (mask == LIFT_UP) {
+            /*
             if (leftIsDown) {
                 leftIsDown = false
                 isWaitingLongPress = false
@@ -137,8 +142,21 @@ class InputService : AccessibilityService() {
                // endGesture(mouseX, mouseY)
                 releaseGesture(mouseX, mouseY)
                 return
+            }*/
+            if(isWaitingLongPress){
+                leftIsDown = false
+                isWaitingLongPress = false
+                startGesture(mouseX, mouseY)
+                endGesture(mouseX, mouseY)
+                return
+            }else{
+               leftIsDown = false
+               isWaitingLongPress = false
+               endGesture(mouseX, mouseY)
+               return 
             }
         }
+            
 
         if (mask == RIGHT_UP) {
             performGlobalAction(GLOBAL_ACTION_BACK)
@@ -326,7 +344,7 @@ class InputService : AccessibilityService() {
         Log.e(logTag, "createGesture error:$e")
     }
 }
- //释放  
+ //长按1秒 
 @RequiresApi(Build.VERSION_CODES.N)
 private fun releaseGesture(x: Int, y: Int) {
     try {
