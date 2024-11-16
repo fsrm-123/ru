@@ -95,7 +95,7 @@ class InputService : AccessibilityService() {
                 Log.d(logTag,"delta:$delta")
                 if (delta > 8) {
                     isWaitingLongPress = false
-                    startGesture(mouseX, mouseY) //开始
+                   // startGesture(mouseX, mouseY) //开始
                 }else{
                     createGesture(mouseX, mouseY) //按下
                 }
@@ -118,7 +118,7 @@ class InputService : AccessibilityService() {
             }, LONG_TAP_DELAY * 4)
 */
             leftIsDown = true
-          //  startGesture(mouseX, mouseY)
+            startGesture(mouseX, mouseY)
             return
         }
 
